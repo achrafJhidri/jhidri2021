@@ -21,6 +21,10 @@ const sunIcon = (props) => (
 const personIcon = (props) => (
   <Icon {...props} name='person'/>
 );
+const missingImg = (props) => (
+  <Icon {...props} name='person'/>
+);
+
 
 export const  Icons = {
   BackIcon,
@@ -29,4 +33,5 @@ export const  Icons = {
   sunIcon,
   HomeIcon,
   personIcon,
+  missingImg
 }

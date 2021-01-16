@@ -4,37 +4,44 @@ import { Divider, List,TopNavigation, Layout, Spinner, Text  } from '@ui-kitten/
 import { connect } from 'react-redux';
 import {DisplayError} from './DisplayError.component'
 import {MyItem} from './Item.component'
-import {apiData} from '../api/data'
+import {getPersonnesById,getMoviesByActorId} from '../api/api'
 
 const FavorisScreen = ({navigation, favorisList }) => {
 
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState([]);
+  const [info, setInfo] = useState([]);
+  const [movies, setMovies] = useState([]);
+
   const [ifError,setError] = useState(false);
 
   useEffect(() => {
-    // loadRestaurants();
+    loadRestaurants();
 }, [favorisList]); 
-const asyncCall = (id) => {
 
-}
 const loadRestaurants = async () => {
-  // try {
-  //     let tab =[]
+  try {
+      let info =[]
+      let movies=[]
       
-  //     for( id of favorisList){
-  //         const result = await asyncCall(id);
-  //         tab.push(result);
+      for( id of favorisList){
+          const informationsOfId = await getPersonnesById(id);
+          const moviesOfId = await getMoviesByActorId(id);
+          info.push(informationsOfId);
+          movies.push(moviesOfId)
       
-  //     }
- 
-  //     setIsLoading(false);
-  //     setResults(tab);
-  //     console.log(result)
-  // } catch (error) {
-  //     setError(true);
-  //     setResults([]);
-  // }
+      }
+
+      setIsLoading(false);
+      setInfo(info);
+      setMovies(movies);
+      setError(false);
+  } catch (error) {
+    console.log(error)
+      setError(true);
+      setInfo([]);
+      setMovies([]);
+
+  }
 }
 const navigateToItemDetails = (id) => {
   navigation.navigate("Details",{
@@ -44,7 +51,7 @@ const navigateToItemDetails = (id) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <TopNavigation title='Favoris' alignment='center'/>
+      <TopNavigation title='Followed' alignment='center'/>
       <Divider/>
       {ifError ?
        <DisplayError message='Impossible de récupérer les données du item' />
@@ -56,13 +63,16 @@ const navigateToItemDetails = (id) => {
        :
 
        <List
-        data={apiData} 
+        data={info} 
         renderItem={
-           ({item}) => 
+           ({item}) =>
                     <MyItem 
                     isFavoris={favorisList.findIndex(i => i === item.id) !== -1}
-                    item={item} 
+                    actorInfo={item} 
+                    actorMovies={movies}
+
                     onClick={navigateToItemDetails} 
+           
                     /> 
 
                   }

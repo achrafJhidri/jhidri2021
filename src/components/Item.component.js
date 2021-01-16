@@ -1,30 +1,30 @@
-import { Text } from '@ui-kitten/components';
 import React from 'react';
-import {  StyleSheet,Image, TouchableOpacity  } from 'react-native';
-import {ItemDescription} from './ItemShortDescription.component'
 
-export const MyItem = ({onClick,item,isFavoris}) => {
+import {  StyleSheet,Image, TouchableOpacity ,View } from 'react-native';
+import {ItemDescription} from './ItemShortDescription.component'
+import {Icons} from '../definitons/icons'
+export const MyItem = ({onClick,actorInfo,isFavoris,actorMovies}) => {
 
     const displayThumbnail = () => {
-        // if (item.thumb) {
+        if (actorInfo.profile_path) {
           return (
-              <Image style={styles.miniatureSize} source={{ uri : "https://cdn.vox-cdn.com/thumbor/HIluJzxPz3qH66lFxxHKVl10UzQ=/0x0:2040x1360/1200x800/filters:focal(857x517:1183x843)/cdn.vox-cdn.com/uploads/chorus_image/image/60211577/acastro_180403_1777_youtube_0001.0.jpg" }} />
+            <Image style={styles.miniatureSize} source={{ uri : "https://image.tmdb.org/t/p/w500"+actorInfo.profile_path }}/>
           );
-        // };
-        // return (
-        //   <View style={styles.noThumbnailContainer}>
-        //     <Image source={Assets.icons.missingImg} />
-        //   </View>
-        // );
+        };
+        return (
+          <View style={styles.noThumbnailContainer}>
+            { <Icon source={Icons.missingImg} /> }
+          </View>
+        );
       }
-    
+
     return (
 
-        <TouchableOpacity  
-             onPress = {() => { onClick(item.id) }}
+        <TouchableOpacity
+             onPress = {() => { onClick(actorInfo.id) }}
              style={styles.container}>
             { displayThumbnail()  }
-            <ItemDescription isFavoris={isFavoris} item={item}/>
+            <ItemDescription isFavoris={isFavoris} item={actorInfo} actorMovies={actorMovies}/>
         </TouchableOpacity>
 
     );
@@ -40,13 +40,13 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         marginTop:10,
         marginLeft:10
-    }, 
+    },
     noThumbnailContainer: {
       width: 128,
       height: 128,
       alignItems: 'center',
       justifyContent: 'center',
     }
-   
+
 })
 

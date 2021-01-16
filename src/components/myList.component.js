@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, Icon, List, ListItem } from '@ui-kitten/components';
-import { SafeAreaView } from 'react-native';
+import { Button, Icon, List, ListItem,Layout } from '@ui-kitten/components';
+import { SafeAreaView,Image ,StyleSheet} from 'react-native';
 import { connect } from 'react-redux';
 
+import {Icons} from '../definitons/icons'
 
- const CostumList = ({navigation,data,dispatch,favorisList}) => {
+ const CostumList = ({isRefreshing,page,onEndReached,navigation,data,dispatch,favorisList}) => {
     const updateFavoris = (id) => {
         let action ;
         favorisList.findIndex(i => i === id) !== -1
@@ -17,14 +18,28 @@ import { connect } from 'react-redux';
     
       }
   const renderItemAccessory = (id) => {
-    let text = favorisList.findIndex(i => i === id) !== -1 ? "remove from favoris" : "add to favoris"
+    let text = favorisList.findIndex(i => i === id) !== -1 ? "unfollow" : "follow"
     
     return ( <Button size='tiny' onPress={()=> updateFavoris(id)}>{text}</Button>
   );}
 
-  const renderItemIcon = (props) => (
-    <Icon {...props} name='person'/>
-  );
+  const renderItemIcon = (path) => {
+    
+  
+  
+    
+    if (path) {
+      return (
+        <Image style={styles.miniatureSize} source={{ uri : "https://image.tmdb.org/t/p/w500"+path }}/>
+      );
+    };
+    return (
+      <Layout style={styles.noThumbnailContainer}>
+        
+         <Icon  name='person'/>
+      </Layout>
+    );
+  };
 
   const showDescription = (id)=>{
     navigation.navigate("Details",{
@@ -32,17 +47,25 @@ import { connect } from 'react-redux';
     })
   }
 
-  const reCallApi = ()=> {
-    
+  
+  const displayThumbnail = () => {
+    if (actorInfo.profile_path) {
+      return (
+        <Image style={styles.miniatureSize} source={{ uri : "https://image.tmdb.org/t/p/w500"+actorInfo.profile_path }}/>
+      );
+    };
+    return (
+      <View style={styles.noThumbnailContainer}>
+        { <Icon source={icons.missingImg} /> }
+      </View>
+    );
   }
-
 
   const renderItem = ({ item, index }) => {
         return(
             <ListItem
-            title={`${item.title} ${index + 1}`}
-            description={`${item.description} ${index + 1}`}
-            accessoryLeft={renderItemIcon}
+            title={`${item.name} `}
+            accessoryLeft={() => renderItemIcon(item.profile_path)}
             accessoryRight={() => renderItemAccessory(item.id)}
             onPress={()=> showDescription(item.id)}
             />)
@@ -52,9 +75,10 @@ import { connect } from 'react-redux';
       <List
         data={data}
         renderItem={renderItem}
-        refreshing={true}
-        // onRefresh={loadRestaurants}
-        // onEndReached={loadRestaurants}
+        keyExtractor={ (item) =>  item.id.toString() } 
+        refreshing={isRefreshing}
+        onRefresh={()=>onEndReached(1)}
+        onEndReached={()=> onEndReached(page)}
         onEndReachedThreshold={0.5}
       />
     </SafeAreaView>
@@ -67,4 +91,25 @@ const mapStateToProps = (state) => {
     }
   }
  export default connect(mapStateToProps)(CostumList);
+
+
+ const styles = StyleSheet.create({
+  miniatureSize: {
+      width:128,
+      height:128,
+      borderRadius:20
+  },
+  container:{
+      flexDirection:"row",
+      marginTop:10,
+      marginLeft:10
+  },
+  noThumbnailContainer: {
+    width: 128,
+    height: 128,
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
+
+})
 

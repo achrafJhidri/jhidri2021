@@ -3,6 +3,7 @@ import { SafeAreaView,Image ,StyleSheet,ScrollView} from 'react-native';
 import { Divider,Button, Icon, Layout, Text,Spinner, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { connect } from 'react-redux';
 import {DisplayError} from './DisplayError.component'
+import {getPersonnesById} from '../api/api'
 
 const BackIcon = (props) => (
   <Icon {...props} name='arrow-back' />
@@ -10,8 +11,8 @@ const BackIcon = (props) => (
 
  const DetailsScreen = ({ navigation,route,dispatch ,favorisList}) => {
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [restaurant, setRestaurant] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [result, setResult] = useState(null);
   const [isError, setIsError] = useState(false);
   const [buttonTitle,setButtonTitle]=useState("")
 
@@ -22,7 +23,9 @@ const BackIcon = (props) => (
   };
   const loadImage = () => {
     return (<Layout   >
-      <Image style={styles.imageView} source={{ uri : "https://cdn.vox-cdn.com/thumbor/HIluJzxPz3qH66lFxxHKVl10UzQ=/0x0:2040x1360/1200x800/filters:focal(857x517:1183x843)/cdn.vox-cdn.com/uploads/chorus_image/image/60211577/acastro_180403_1777_youtube_0001.0.jpg"}} />
+      {/* <Image style={styles.imageView} source={{ uri : "https://cdn.vox-cdn.com/thumbor/HIluJzxPz3qH66lFxxHKVl10UzQ=/0x0:2040x1360/1200x800/filters:focal(857x517:1183x843)/cdn.vox-cdn.com/uploads/chorus_image/image/60211577/acastro_180403_1777_youtube_0001.0.jpg"}} /> */}
+      <Image style={styles.imageView} source={{ uri : "https://image.tmdb.org/t/p/w500/"+result.profile_path }}/>
+
     </Layout>);
   }
 
@@ -31,12 +34,12 @@ const BackIcon = (props) => (
     let action ; 
     if ( favorisList.findIndex(i => i === route.params.id) !== -1){
       action = {type: 'REMOVE', value: route.params.id};
-      setButtonTitle("Add to favorits")
+      setButtonTitle("follow")
 
     }else{
       
       action = {type: 'ADD', value: route.params.id};
-      setButtonTitle("Remove from favorits")
+      setButtonTitle("unfollow")
 
     }
    
@@ -45,37 +48,27 @@ const BackIcon = (props) => (
 
 
   useEffect(() => {
-    // requestRestaurant();
+    requestDetails();
     favorisList.findIndex(i => i === route.params.id) !== -1 
     ? 
-    setButtonTitle("Remove from favorits")
+    setButtonTitle("unfollow")
     :
-    setButtonTitle("Add to favorits")
+    setButtonTitle("follow")
         
     
   }, []); 
   
-  const requestRestaurant = async () => {
+  const requestDetails = async () => {
     try {
-        const RestaurantResult = await getRestaurantbyId(route.params.id);
-        setRestaurant(RestaurantResult);
+
+        const resultat = await getPersonnesById(route.params.id);
+        setResult(resultat);
         setIsLoading(false);
       } catch (error) {
         setIsError(true);
     }
   }
-  const parseTimings = () => {
-    let resultat =   ["soufiane","achraf"];
-    let table = []
-    resultat.forEach((item,index) => table.push(
-    <Text key={index}>
-        {item}
-    </Text>
-    ))
-    return (<Layout>
-      {table}
-    </Layout>);
-  }
+
 
   const BackAction = () => (
     <TopNavigationAction icon={BackIcon} onPress={navigateBack}/>
@@ -87,7 +80,7 @@ const BackIcon = (props) => (
       <Divider/>
       <Layout style={{ flex: 1 }}>
       {isError ?
-        (<DisplayError message='Impossible de récupérer les données du restaurants' />) :
+        (<DisplayError message="Impossible de récupérer les données de l'acteur" />) :
         (isLoading ?
           (<Layout style={styles.containerLoading}>
             <Spinner  />
@@ -99,19 +92,8 @@ const BackIcon = (props) => (
 
                 <Layout style={{flexDirection:"row",margin : 10,borderRadius:5,elevation:1}}>
                   <Layout style={styles.gauche}>
-                    <Text style = {{fontWeight:"bold"}} >sushi chop</Text> 
-                    <Text style = {{marginTop:10}} >agadir city</Text>
-                  </Layout>
-                  
-                  <Layout style={styles.droite}>
-                    <Layout style = {{ backgroundColor:"#00FF00", flexDirection:"row", borderRadius:5,padding:5 }}>
-                      <Text style = {{fontWeight:"bold",color:"white"}} >4.3 </Text> 
-                      <Text style = {{color:"white",padding:3}} >/5</Text> 
-                    </Layout>
-
-                    <Text style = {{fontSize:12,fontStyle:"italic"}}>
-                      399 votes
-                    </Text>
+                    <Text style = {{fontWeight:"bold"}} >{result.name}</Text> 
+                    <Text style = {{marginTop:10}} >{result.gender=="2" ? "Homme":"femme"}</Text>
                   </Layout>
                 </Layout>
 
@@ -119,22 +101,18 @@ const BackIcon = (props) => (
 
                 <Layout style={[styles.corp,{elevation:1}]}>
                   <Layout  style={{margin : 10,marginTop:10}} >
-                    <Text style = {styles.bigTitles}>Cuisines</Text>
-                    <Text style = {styles.info}>MAl7 skar bismilah</Text>
+                    <Text style = {styles.info}> travail en tant que : {result.known_for_department}</Text>
+                    <Text style = {styles.info}>date de naissance : {result.birthday}</Text>
+                    <Text style = {styles.info}>date de mort ? : {result.deathday ? result.deathday : "encore vivant"}</Text>
+                    <Text style = {styles.info}> Biography : {result.biography}</Text>
+
+
+
                   </Layout>
-                  <Layout  style={{margin : 10,marginTop:0}} >
-                    <Text style = {styles.bigTitles}>Numéro(s) de téléphone</Text>
-                    <Text style = {styles.info}>+3307192243</Text>
-                  </Layout>
-                  <Layout  style={{margin: 10,marginTop:0}} >
-                    <Text style = {styles.bigTitles}>Adresse</Text>
-                    <Text style = {styles.info}>9 rue serpenoise</Text>
-                  </Layout>
-                  <Layout  style={{margin: 10,marginTop:0,marginBottom:10}} >
-                    <Text style = {styles.bigTitles}>Horraires d'ouverture</Text>
-                    {parseTimings()}
+                 
+
                     
-                  </Layout>
+                  
                 </Layout>
 
                 <Layout style={{margin : 10}}>
@@ -182,7 +160,7 @@ const styles = StyleSheet.create({
   imageView: {
    margin:10,
    height: 280,
-   resizeMode: 'stretch',
+   resizeMode: 'center',
    borderBottomRightRadius:2,
    borderBottomLeftRadius:2
 },   

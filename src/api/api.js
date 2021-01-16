@@ -1,23 +1,29 @@
-const KEY_ID = "8edc6b436a4fb1da26d4df5ec900465c"
+const KEY_ID = "4cdaf1047e327d462d95b560fbce7642"
 
-const header = new Headers({"user_key":KEY_ID}) ;
 
-export const getRestaurants = async (search,count = 0) => {
-  return fetchFunction("https://developers.zomato.com/api/v2.1/search?entity_id=61&entity_type=city&q="+search+"&start="+count);
+
+export const getPersonnes = async (page) => {
+  return fetchFunction("https://api.themoviedb.org/3/person/popular?api_key="+KEY_ID+"&page="+page);
   };
 
-export const getRestaurantbyId = async (key) => {
-  return fetchFunction("https://developers.zomato.com/api/v2.1/restaurant?res_id="+key);
+export const getPersonnesByName = async (name) => {
+  return fetchFunction("https://api.themoviedb.org/3/search/person?api_key="+KEY_ID+"&page=1&query="+name);
+};
+export const getPersonnesById = async (id) => {
+  return fetchFunction("https://api.themoviedb.org/3/person/"+id+"?api_key="+KEY_ID+"&language=en-US");
+};
+export const getMoviesByActorId = async (id) => {
+  return fetchFunction("https://api.themoviedb.org/3/person/"+id+"/movie_credits?api_key="+KEY_ID+"&language=en-US");
 };
 
 fetchFunction = async (url ) => {
   try {
 
     const response = await fetch(
-      url,
-      { headers : header }
+      url
     );
     const json = await response.json();
+    
     
     return json;
   } catch (error) {
