@@ -4,7 +4,7 @@
 * Scroll permet de charger plus de résultats : Oui
 * Recherche de personnes : Oui
 * Scroll permet de charger plus de résultats : Oui
-* Annuler la recherche affiche les personnes en tendance : Oui
+* Annuler la recherche affiche les personnes en tendance : Non
 * Un clic redirige sur la page de la personne : Oui
 * Affichage des informations générales d'une personne : Oui
 * Affichage des médias d'une personne : Non
